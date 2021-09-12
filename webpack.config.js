@@ -1,8 +1,16 @@
 const path = require('path');
+const glob = require('glob');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
-    mode: 'development',
+    // entry: glob.sync('./app/**.js').reduce(function (obj, el) {
+    //     obj[path.parse(el).name] = el;
+    //     return obj;
+    // }, {}),
+
+    output: {
+        filename: 'scripts/[name].js',
+    },
     module: {
         rules: [
             {
@@ -16,18 +24,27 @@ module.exports = {
                 test: /\.s?[ac]ss$/,
                 use: [
                     MiniCssExtractPlugin.loader,
-                    'css-loader',
+                    {
+                        loader: 'css-loader',
+                        options: {
+                            url: false,
+                        },
+                    },
                     'postcss-loader',
                     'sass-loader',
                 ],
             },
         ],
     },
-    plugins: [new MiniCssExtractPlugin()],
+    plugins: [
+        new MiniCssExtractPlugin({
+            filename: 'styles/[name].css',
+        }),
+    ],
     devtool: 'source-map',
     devServer: {
         static: {
-            directory: path.join(__dirname, './public'),
+            directory: path.join(__dirname, './app'),
         },
         hot: true,
     },
